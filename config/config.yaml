@@ -1,0 +1,75 @@
+# Main settings for the local AI system.
+#
+# Any value here can be overridden without editing this file by setting an
+# environment variable named LAI_<SECTION>__<KEY> (two underscores between
+# parts). Example:  LAI_BACKEND__MODEL=llama3.2:3b
+# Put overrides in a .env file in the project root (see .env.example).
+
+backend:
+  kind: ollama                       # ollama, or mock (for tests, no model needed)
+  host: http://127.0.0.1:11434
+  model: qwen3:4b
+  embed_model: nomic-embed-text      # small embedding model, runs on CPU
+  request_timeout_s: 600
+
+generation:
+  num_ctx: 4096                      # context window in tokens
+  max_tokens: 1024                   # cap on tokens generated per reply
+  temperature: 0.3
+  num_gpu: null                      # null lets Ollama pick GPU layers. Set a number to force it
+  num_thread: 6                      # CPU threads. 6800H has 8 cores, 6 leaves room for the system
+  use_mmap: null                     # null keeps the server default (mmap on). false loads weights into RAM instead
+  keep_alive: 10m                    # how long the model stays loaded when idle
+  think: false                       # Qwen3 thinking mode. Off is much faster for agent work
+
+# If the model cannot load (out of memory) the client steps down: first half the
+# context, then the next model in this list. The working setup is then kept.
+fallback:
+  enabled: true
+  models: [llama3.2:3b, qwen3:1.7b]
+  min_ctx: 2048
+
+# These are applied to the Ollama SERVER by scripts/01_setup_ollama.sh.
+# The Python app does not read them. They are kept here so everything lives in one place.
+ollama_server:
+  OLLAMA_HOST: 127.0.0.1:11434
+  OLLAMA_FLASH_ATTENTION: "1"
+  OLLAMA_KV_CACHE_TYPE: q8_0         # f16, q8_0 or q4_0. q8_0 halves cache memory
+  OLLAMA_NUM_PARALLEL: "1"
+  OLLAMA_MAX_LOADED_MODELS: "2"      # chat model plus the small embedding model
+  OLLAMA_KEEP_ALIVE: 10m
+  # OLLAMA_MODELS: ~/ai-models/ollama   # uncomment to keep weights outside the default folder
+
+paths:
+  data_dir: ~/local-ai-data          # databases, uploaded documents, logs
+  workspace_dirs:                    # the ONLY folders the file tools may touch
+    - ~/ai-workspace
+
+rag:
+  embedder: auto                     # auto, ollama or hashing (no model, keyword-like)
+  chunk_chars: 900
+  chunk_overlap: 120
+  top_k: 4
+  min_score_ollama: 0.45             # tune on your own documents
+  min_score_hashing: 0.12
+  max_context_chars: 4000
+
+agents:
+  max_steps: 6                       # tool-call rounds per request
+  retries: 1                         # retries when the model backend fails before any output
+
+memory:
+  keep_last_messages: 8
+  summarize_after_chars: 6000
+  max_facts_in_prompt: 12
+
+security:
+  approval_timeout_s: 120            # no answer in this time means the action is denied
+  auto_approve_tests: false          # true lets run_tests run without asking
+  allowed_hosts: [localhost, 127.0.0.1, "[::1]", testserver]
+  blocked_commands: [sudo, su, mkfs, dd, shutdown, reboot, poweroff, chmod, chown, curl, wget, ssh, scp]
+
+ui:
+  host: 127.0.0.1
+  port: 8000
+  max_upload_mb: 50

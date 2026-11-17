@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Local AI System</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="layout">
+
+  <aside class="left">
+    <div class="brand">Local AI</div>
+    <button id="newChat" class="primary">New chat</button>
+
+    <label>Agent
+      <select id="agentSelect"></select>
+    </label>
+    <label>Model
+      <select id="modelSelect"></select>
+    </label>
+    <button id="unloadBtn" class="ghost" title="Free the memory used by the model">Unload model</button>
+
+    <h3>Conversations</h3>
+    <ul id="sessionList" class="list"></ul>
+
+    <h3>Documents</h3>
+    <label class="upload">
+      <input id="fileInput" type="file" multiple accept=".pdf,.txt,.md,.markdown,.docx">
+      <span>Upload PDF, TXT, MD, DOCX</span>
+    </label>
+    <div id="uploadMsg" class="note"></div>
+    <ul id="docList" class="list"></ul>
+  </aside>
+
+  <main class="center">
+    <div id="chat" class="chat"></div>
+    <form id="form" class="composer">
+      <textarea id="input" rows="2" placeholder="Ask something. Enter to send, Shift+Enter for a new line."></textarea>
+      <button id="sendBtn" class="primary" type="submit">Send</button>
+    </form>
+  </main>
+
+  <aside class="right">
+    <h3>Current agent</h3>
+    <div id="agentBadge" class="badge idle">idle</div>
+    <div id="agentStep" class="note"></div>
+
+    <h3>Approvals</h3>
+    <div id="approvals" class="note">Nothing waiting.</div>
+
+    <h3>Tool log</h3>
+    <ul id="toolLog" class="log"></ul>
+
+    <h3>Resources</h3>
+    <div id="meters"></div>
+    <div id="loadedModels" class="note"></div>
+  </aside>
+
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>

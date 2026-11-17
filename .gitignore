@@ -1,0 +1,11 @@
+.env
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.gguf
+models/*
+!models/README.md
+benchmarks/results/*
+!benchmarks/results/.gitkeep
